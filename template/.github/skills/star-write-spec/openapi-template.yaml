@@ -1,0 +1,193 @@
+openapi: 3.1.0
+info:
+  title: <Feature> API
+  version: 0.1.0
+  description: >
+    <One paragraph: what this API does. Keep in sync with the Overview in spec.md.>
+servers:
+  - url: /api/v1
+tags:
+  - name: <resource>
+    description: Operations on <resource>
+paths:
+  /things:
+    get:
+      tags: [<resource>]
+      summary: List things
+      description: >
+        <Purpose. Include pagination note: "Returns a paged list..." >
+      operationId: listThings
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThingListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [<resource>]
+      summary: Create a thing
+      operationId: createThing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateThingRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thing'
+          headers:
+            Location:
+              description: URL of the created resource
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /things/{id}:
+    get:
+      tags: [<resource>]
+      summary: Fetch a thing by id
+      operationId: getThing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thing'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    page:
+      name: page
+      in: query
+      description: Zero-based page index
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    size:
+      name: size
+      in: query
+      description: Page size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  schemas:
+    Thing:
+      type: object
+      description: A thing.
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier
+        name:
+          type: string
+          maxLength: 100
+        createdAt:
+          type: string
+          format: date-time
+    CreateThingRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+    ThingListResponse:
+      type: object
+      description: Paged result envelope.
+      required: [content, page, size, totalElements, totalPages]
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Thing'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+    Error:
+      type: object
+      description: >
+        RFC 7807-style error envelope used by all error responses.
+        Field-level validation errors additionally populate `fields`.
+      required: [type, title, status, detail, instance]
+      properties:
+        type:
+          type: string
+          description: Error type URI or about:blank
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          description: Request path that produced the error
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field name → validation message
+
+  responses:
+    BadRequest:
+      description: Malformed request (bad JSON, invalid parameter format)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntity:
+      description: Semantically invalid input (e.g. duplicate unique field)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
