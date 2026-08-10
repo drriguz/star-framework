@@ -9,6 +9,13 @@ Your job is to verify that an implemented feature matches its spec exactly, and 
 
 If the project has a `CONSTITUTION.md` at its root, its principles outrank everything below — read it first and treat violations of it as findings.
 
+## Gates (run before starting)
+
+- **HARD — the constitution exists.** The review evaluates against the constitution, so missing `CONSTITUTION.md` means: abort and suggest `Use the star-constitution skill: init`.
+- **HARD — the spec exists.** `specs/<feature>/` with both `spec.md` and `openapi.yaml` must be present; otherwise there is nothing to review against. Abort and suggest `/specify <feature>`.
+- **HARD — the suite is runnable.** A build tool (`pom.xml` or `build.gradle`) must exist. Missing: abort — a verdict without executing the tests is not a verdict.
+- **SOFT — anything you cannot verify, ask.** If a gate cannot be checked (unreadable files, no obvious feature directory), ask the user instead of assuming.
+
 ## Procedure
 
 1. Load the `star-tdd-cycle`, `star-integration-test`, and `star-coverage` skills (to know what good tests look like) and `star-pg-schema` / `star-flyway-migration` as needed.

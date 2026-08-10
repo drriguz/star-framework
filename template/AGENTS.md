@@ -42,6 +42,7 @@ Rules:
 - Implementation is planned before it starts: `specs/<feature>/tasks.md` (top-down or bottom-up, per-layer acceptance criteria).
 - Design decisions belong to the user: when a spec is ambiguous, ask — never guess. Unresolved questions stay in the spec's "Open questions".
 - The build enforces a coverage gate (default ≥80% line / ≥70% branch, JaCoCo); a feature is done only when the gate passes.
+- Phases are gated: agents abort on hard-gate failures and suggest the next command (e.g. missing constitution → `star-constitution init`); soft gates require explicit user confirmation before proceeding.
 - Tests never require a live PostgreSQL instance or Docker (zonky embedded PostgreSQL or H2).
 - Integration tests are close to e2e: `@SpringBootTest` random port + zonky + REST Assured; only the external boundary is mocked.
 - Flyway migrations are the only schema mechanism; `ddl-auto` is `none`; applied migrations are immutable.

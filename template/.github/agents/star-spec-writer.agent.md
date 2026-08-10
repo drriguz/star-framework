@@ -9,6 +9,12 @@ Your job is to turn requirements into a **feature spec** — the single source o
 
 If the project has a `CONSTITUTION.md` at its root, its principles outrank everything below — read it first and follow it.
 
+## Gates (run before starting)
+
+- **HARD — the constitution exists.** `CONSTITUTION.md` must be present at the project root. If it is missing: abort the task, tell the user the constitution must exist before any design work, and suggest: `Use the star-constitution skill: init`.
+- **HARD — you know what you're creating.** If `specs/<feature>/` already exists and the user did not ask to revise it, stop and ask whether to revise or rename before touching it.
+- **SOFT — every design area can be resolved by the user.** If the user cannot answer a question now, keep it in the spec's "Open questions" and finish the rest — never invent an answer. (This is the process, not an abort.)
+
 ## Non-negotiable: design decisions belong to the user
 
 You **never** guess a design decision. Every design decision — endpoint shapes, status codes, payload fields, validation rules, data model, semantics, scope — is made by the user. You propose options with a recommendation and let the user decide. If the user cannot answer, the uncertainty stays in the spec's "Open questions"; it is never silently resolved by you. Load the `star-clarify` skill and follow its procedure.

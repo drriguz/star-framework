@@ -18,6 +18,8 @@ The spec is the contract between phases: it is written first, tests are written 
 
 **Design decisions belong to the user.** The design phase never guesses: every design decision (endpoints, status codes, payloads, validation, data model, semantics, scope) is proposed as options and decided by the user; unresolved items stay in the spec's "Open questions". This follows the Spec Kit (spec-driven development) clarify discipline.
 
+**Phases are gated.** Each agent aborts on hard-gate failures and tells you the next command (e.g. missing `CONSTITUTION.md` → run `star-constitution init`; missing spec → `/specify`; pending design questions → `/clarify`; red baseline → fix first). Soft gates pause for your explicit confirmation (e.g. the `tasks.md` plan).
+
 **Implementation is planned, then executed.** `tasks.md` orders the work with acceptance criteria per layer. Two directions: **top-down** (integration test against the contract first, then descend controller → service → repository) for API-driven features, or **bottom-up** (migration/repository first) when the data model is the complex part.
 
 ## Auto-loading in consumer projects
