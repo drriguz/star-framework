@@ -49,6 +49,7 @@ Use the star-constitution skill: inspect     → audits the constitution + repo 
 | `template/.github/skills/star-task-split/` | Implementation plan: `tasks.md`, top-down vs bottom-up, per-layer acceptance criteria |
 | `template/.github/skills/star-tdd-cycle/` | Red-green procedure, test slices, test commands |
 | `template/.github/skills/star-integration-test/` | Close-to-e2e tests: `@SpringBootTest` random port, zonky embedded PG, REST Assured, boundary-only mocks |
+| `template/.github/skills/star-coverage/` | Coverage gate mechanics (JaCoCo, ≥80% line / ≥70% branch default) |
 | `template/.github/skills/star-endpoint-scaffold/` | Controller/service/repository/DTO layering, validation, errors |
 | `template/.github/skills/star-flyway-migration/` | Migration naming, immutability rules, `ddl-auto` off |
 | `template/.github/skills/star-pg-schema/` | PG type/key/constraint/index conventions |
@@ -92,5 +93,6 @@ See [GitHub docs on custom agents](https://docs.github.com/en/copilot/reference/
 - Test-first, per spec section: red → green, feature by feature.
 - Test slices: `@WebMvcTest` for REST, `@DataJpaTest` for persistence, `@SpringBootTest` + zonky embedded PG for integration; tests never require a live PG instance or Docker.
 - Integration tests are close to e2e: random-port real HTTP, zonky embedded PostgreSQL, REST Assured for API validation, mocks only at the external boundary.
+- The build enforces a coverage gate (JaCoCo, default ≥80% line / ≥70% branch), codified in the constitution template and `star-coverage`.
 - Flyway migrations are the only schema mechanism (`spring.jpa.hibernate.ddl-auto: none`).
 - Errors follow the RFC 7807-style envelope defined in each spec's OpenAPI document.

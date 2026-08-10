@@ -35,6 +35,7 @@ This file governs agents working **on this repo** (authoring/maintaining the fra
 
 - Never skip the test-first step: red → green, feature by feature, spec section by section.
 - Design decisions belong to the user: when a spec is ambiguous, agents must ask (via `star-clarify`), never guess.
+- Coverage is a build-enforced gate (JaCoCo, default ≥80% line / ≥70% branch): policy lives in the constitution template (clause 3), mechanics in `star-coverage`.
 - `openapi.yaml` is the source of truth for the API contract — implementation must not drift from it; update spec before code if the contract changes.
 - Tests must not require a live PG instance or Docker (zonky embedded PostgreSQL or H2 in tests); migrations via Flyway are the only schema mechanism.
 - Integration tests are close to e2e: `@SpringBootTest` random port, zonky embedded PG, REST Assured, mocks only at the external boundary — as codified in `star-integration-test`.

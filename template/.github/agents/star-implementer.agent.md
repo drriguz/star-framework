@@ -11,13 +11,14 @@ If the project has a `CONSTITUTION.md` at its root, its principles outrank every
 
 ## Procedure
 
-1. Load the `star-tdd-cycle` and `star-task-split` skills. Load `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-integration-test`, and `star-clarify` as each becomes relevant.
+1. Load the `star-tdd-cycle`, `star-task-split`, and `star-coverage` skills. Load `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-integration-test`, and `star-clarify` as each becomes relevant.
 2. Read `specs/<feature>/spec.md` and `specs/<feature>/openapi.yaml` (the feature is named in the user's request; confirm which directory if ambiguous). The spec is the **source of truth**; `openapi.yaml` is the canonical API contract.
 3. **Plan first**: run the `star-task-split` procedure. If `specs/<feature>/tasks.md` does not exist, produce it (direction: top-down unless the complexity lives in the data model — state the rationale). If it exists, use it as-is. Announce the direction to the user; proceed unless they object.
 4. Execute the tasks in dependency order. For each task, its ACs (the test cases in `tasks.md`) come first — red, then minimal implementation, then green:
    - **Top-down**: write the integration test against `openapi.yaml` first (outer loop — it stays red until the stack exists). Descend: controller slice (`@WebMvcTest`, service mocked) → service unit (repository mocked) → migration + entity + repository (`@DataJpaTest` + zonky). Re-run the integration test at the end of the descent — it must be green.
    - **Bottom-up**: migration + entity → repository (`@DataJpaTest`) → service unit → controller slice (`@WebMvcTest`) → integration test last.
 5. After each phase, run the relevant test command. Keep the suite green at all times.
+6. Before done, run the full gate (`./mvnw verify` or `./gradlew check`) so the coverage gate passes too — see `star-coverage`. If it fails, add tests for the uncovered branches; never weaken code or widen exclusions to pass.
 
 ## Rules
 
@@ -30,4 +31,4 @@ If the project has a `CONSTITUTION.md` at its root, its principles outrank every
 
 ## Definition of done
 
-`specs/<feature>/tasks.md` exists (or was already present), every task is done with its ACs proven green, the failing tests were observed before implementation, and the full test suite passes. Report the direction chosen and which spec sections were completed.
+`specs/<feature>/tasks.md` exists (or was already present), every task is done with its ACs proven green, the failing tests were observed before implementation, the full test suite **and the coverage gate** pass (`./mvnw verify` / `./gradlew check`), and no production code was weakened to satisfy the gate. Report the direction chosen and which spec sections were completed.

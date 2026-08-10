@@ -33,7 +33,7 @@ Rules:
 ## Agents, skills, and commands available
 
 - Agents: `star-spec-writer`, `star-implementer`, `star-reviewer` (in `.github/agents/`)
-- Skills: `star-write-spec`, `star-clarify`, `star-task-split`, `star-tdd-cycle`, `star-integration-test`, `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-constitution` (in `.github/skills/`)
+- Skills: `star-write-spec`, `star-clarify`, `star-task-split`, `star-tdd-cycle`, `star-integration-test`, `star-coverage`, `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-constitution` (in `.github/skills/`)
 - Commands: `/specify`, `/clarify`, `/tasks`, `/implement`, `/review` (in `.github/commands/`)
 
 ## Non-negotiables (detailed rules live in the skills)
@@ -41,6 +41,7 @@ Rules:
 - Test-first: no production code without a failing test; suite stays green.
 - Implementation is planned before it starts: `specs/<feature>/tasks.md` (top-down or bottom-up, per-layer acceptance criteria).
 - Design decisions belong to the user: when a spec is ambiguous, ask — never guess. Unresolved questions stay in the spec's "Open questions".
+- The build enforces a coverage gate (default ≥80% line / ≥70% branch, JaCoCo); a feature is done only when the gate passes.
 - Tests never require a live PostgreSQL instance or Docker (zonky embedded PostgreSQL or H2).
 - Integration tests are close to e2e: `@SpringBootTest` random port + zonky + REST Assured; only the external boundary is mocked.
 - Flyway migrations are the only schema mechanism; `ddl-auto` is `none`; applied migrations are immutable.

@@ -33,6 +33,7 @@ Purpose: verify the constitution exists, is complete, and is being followed.
    - `specs/` exists and each implemented feature has a spec directory.
    - No entity is serialized directly in controller return types (scan controllers + DTO usage).
    - Test files don't hard-code a connection to a live database.
+   - Coverage gate is enforced in the build (JaCoCo or equivalent, minimum at or above the constitution's threshold — see `star-coverage`).
 4. Produce a report:
 
 ```

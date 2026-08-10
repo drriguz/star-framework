@@ -34,14 +34,14 @@ Before the first test, produce the implementation plan with the `star-task-split
 
 1. Implement the **minimal** code that passes — no speculative extras.
 2. For schema changes: write the Flyway migration (see `star-flyway-migration`) **before** the code that reads/writes the new column or table.
-3. Run the single test again; then run the full suite:
+3. Run the single test again; then run the full suite **with the coverage gate**:
 
 ```bash
-./mvnw test      # Maven
-./gradlew test   # Gradle
+./mvnw verify      # Maven (includes jacoco check)
+./gradlew check    # Gradle (includes jacocoTestCoverageVerification)
 ```
 
-4. Confirm the whole suite is green before moving to the next section.
+4. If the gate fails, read the coverage report, add tests for the uncovered branches — never weaken code, never widen exclusions (see `star-coverage`).
 
 ## Rules
 

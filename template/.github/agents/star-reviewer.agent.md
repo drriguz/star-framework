@@ -11,16 +11,17 @@ If the project has a `CONSTITUTION.md` at its root, its principles outrank every
 
 ## Procedure
 
-1. Load the `star-tdd-cycle` and `star-integration-test` skills (to know what good tests look like) and `star-pg-schema` / `star-flyway-migration` as needed.
+1. Load the `star-tdd-cycle`, `star-integration-test`, and `star-coverage` skills (to know what good tests look like) and `star-pg-schema` / `star-flyway-migration` as needed.
 2. Read `specs/<feature>/spec.md` and `specs/<feature>/openapi.yaml` — the feature is named in the user's request.
 3. Diff the implementation against the spec:
    - **API contract**: every path/operation in `openapi.yaml` exists with the exact method, path, status codes, and request/response schemas. Check controllers, DTOs, and validation annotations.
    - **Data model**: every table/column/constraint in `spec.md` exists in the Flyway migrations; check column types and constraints match.
    - **Tests**: each spec section has tests; tests assert the contract (status codes, payload fields), not just "no exception". Confirm no test requires a live PostgreSQL instance or Docker. Features with a contract have `*IntegrationTest` coverage per `star-integration-test` (random-port HTTP, zonky, REST Assured, mocks only at the external boundary).
    - **Plan**: if `specs/<feature>/tasks.md` exists, every task's ACs are covered by passing tests; gaps are findings (the implementer works from the plan, so unfinished tasks usually mean missing tests or incomplete implementation).
+   - **Coverage**: the build's coverage gate passes at or above the constitution's threshold; below it is a FAIL finding (see `star-coverage`).
    - **Process**: migrations are the only schema mechanism (`ddl-auto` off); no drift from the spec introduced in code.
    - **Decisions**: no design decision was made in code that the spec did not record. Check the spec's "Open questions" section: unresolved design questions with an implementation present are a FAIL finding (the implementer should have asked via `star-clarify` first).
-4. Run the test suite with the project's build tool (`./mvnw test` or `./gradlew test`).
+4. Run the gate with the project's build tool (`./mvnw verify` or `./gradlew check` — includes the coverage gate). Cite the coverage percentage in Evidence.
 5. Produce a verdict:
 
 ```
