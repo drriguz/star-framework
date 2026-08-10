@@ -26,9 +26,10 @@ This file governs agents working **on this repo** (authoring/maintaining the fra
 ## Core workflow the template delivers (spec-driven + TDD)
 
 1. `/specify` → spec-writer writes `specs/<feature>/spec.md` + `openapi.yaml` (API contract: paths, status codes, schemas; PG data model in `spec.md`). Design decisions are never guessed — `/clarify` resolves ambiguity with the user (Spec Kit pattern).
-2. `/implement <feature>` → implementer turns each spec section into failing tests first (`@WebMvcTest` for REST, `@DataJpaTest` for persistence), then code, until green.
-3. `/review <feature>` → reviewer diffs implementation vs spec (contract drift, schema drift, test quality), runs the suite, reports PASS/FAIL.
-4. Target stack defaults: Spring Boot (controllers, service/repository layering), PostgreSQL, Flyway migrations for schema.
+2. `/tasks` → implementer produces `specs/<feature>/tasks.md`: dependency-ordered tasks with per-layer acceptance criteria, top-down (integration test first) or bottom-up (persistence first).
+3. `/implement <feature>` → implementer executes tasks in order, red → green per task (`@WebMvcTest` for REST, `@DataJpaTest` for persistence, `@SpringBootTest` + zonky integration).
+4. `/review <feature>` → reviewer diffs implementation vs spec (contract drift, schema drift, test quality, plan coverage), runs the suite, reports PASS/FAIL.
+5. Target stack defaults: Spring Boot (controllers, service/repository layering), PostgreSQL, Flyway migrations for schema.
 
 ## Conventions
 

@@ -8,7 +8,7 @@ specs/<feature>/
 └── openapi.yaml   — the API contract (canonical): paths, status codes, request/response schemas — OpenAPI 3.1
 ```
 
-The implementer writes failing tests against `openapi.yaml`; the reviewer verifies compliance against both files.
+The implementer writes failing tests against `openapi.yaml`; the reviewer verifies compliance against both files. `/tasks` produces `tasks.md` in the same directory — the implementation plan with per-layer acceptance criteria (a working artifact, not part of the contract).
 
 ## Workflow
 

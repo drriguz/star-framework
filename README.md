@@ -9,13 +9,16 @@ Everything distributable lives in [`template/`](template/): Copilot agents, skil
 ```
 /specify   →  spec-writer writes specs/<feature>/ (spec.md + openapi.yaml: API contract + PG data model)
 /clarify   →  targeted questions resolve design ambiguity; answers folded back into the spec
-/implement →  implementer turns each spec section into failing tests, then code, until green
-/review    →  reviewer diffs implementation vs spec, checks tests, runs suite, reports verdict
+/tasks     →  implementation plan: specs/<feature>/tasks.md (top-down or bottom-up, per-layer acceptance criteria)
+/implement →  implementer executes the tasks red → green, layer by layer
+/review    →  reviewer diffs implementation vs spec, checks tests + plan coverage, runs suite, reports verdict
 ```
 
 The spec is the contract between phases: it is written first, tests are written against its OpenAPI contract, and it is checked at the end. If a contract change is needed, update the spec before the code.
 
 **Design decisions belong to the user.** The design phase never guesses: every design decision (endpoints, status codes, payloads, validation, data model, semantics, scope) is proposed as options and decided by the user; unresolved items stay in the spec's "Open questions". This follows the Spec Kit (spec-driven development) clarify discipline.
+
+**Implementation is planned, then executed.** `tasks.md` orders the work with acceptance criteria per layer. Two directions: **top-down** (integration test against the contract first, then descend controller → service → repository) for API-driven features, or **bottom-up** (migration/repository first) when the data model is the complex part.
 
 ## Auto-loading in consumer projects
 
@@ -43,6 +46,7 @@ Use the star-constitution skill: inspect     → audits the constitution + repo 
 | `template/.github/agents/star-reviewer.agent.md` | Compliance reviewer; verdict only, never fixes |
 | `template/.github/skills/star-write-spec/` | Spec-writing procedure + quality checklist + `spec-template.md` + `openapi-template.yaml` |
 | `template/.github/skills/star-clarify/` | Design ambiguity → targeted questions to the user; answers folded into the spec |
+| `template/.github/skills/star-task-split/` | Implementation plan: `tasks.md`, top-down vs bottom-up, per-layer acceptance criteria |
 | `template/.github/skills/star-tdd-cycle/` | Red-green procedure, test slices, test commands |
 | `template/.github/skills/star-integration-test/` | Close-to-e2e tests: `@SpringBootTest` random port, zonky embedded PG, REST Assured, boundary-only mocks |
 | `template/.github/skills/star-endpoint-scaffold/` | Controller/service/repository/DTO layering, validation, errors |
@@ -51,6 +55,7 @@ Use the star-constitution skill: inspect     → audits the constitution + repo 
 | `template/.github/skills/star-constitution/` | Initializes/audits `CONSTITUTION.md` + `constitution-template.md` |
 | `template/.github/commands/specify.md` | `/specify` — new feature spec |
 | `template/.github/commands/clarify.md` | `/clarify` — resolve design ambiguity in a spec |
+| `template/.github/commands/tasks.md` | `/tasks` — implementation plan for a feature |
 | `template/.github/commands/implement.md` | `/implement <feature>` — TDD implementation |
 | `template/.github/commands/review.md` | `/review <feature>` — spec-compliance review |
 | `template/specs/` | Feature specs, one directory per feature |

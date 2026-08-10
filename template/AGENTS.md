@@ -26,18 +26,20 @@ Rules:
 
 - `/specify` — turn a feature idea into `specs/<feature>/spec.md` + `openapi.yaml` (spec-writer agent)
 - `/clarify` — resolve design ambiguity in a spec with targeted questions (spec-writer agent)
-- `/implement <feature>` — TDD implementation, red → green per spec section (implementer agent)
+- `/tasks <feature>` — produce the implementation plan `specs/<feature>/tasks.md` (implementer agent)
+- `/implement <feature>` — TDD implementation following tasks.md, red → green per task (implementer agent)
 - `/review <feature>` — spec-compliance review, PASS/FAIL verdict (reviewer agent)
 
 ## Agents, skills, and commands available
 
 - Agents: `star-spec-writer`, `star-implementer`, `star-reviewer` (in `.github/agents/`)
-- Skills: `star-write-spec`, `star-clarify`, `star-tdd-cycle`, `star-integration-test`, `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-constitution` (in `.github/skills/`)
-- Commands: `/specify`, `/clarify`, `/implement`, `/review` (in `.github/commands/`)
+- Skills: `star-write-spec`, `star-clarify`, `star-task-split`, `star-tdd-cycle`, `star-integration-test`, `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-constitution` (in `.github/skills/`)
+- Commands: `/specify`, `/clarify`, `/tasks`, `/implement`, `/review` (in `.github/commands/`)
 
 ## Non-negotiables (detailed rules live in the skills)
 
 - Test-first: no production code without a failing test; suite stays green.
+- Implementation is planned before it starts: `specs/<feature>/tasks.md` (top-down or bottom-up, per-layer acceptance criteria).
 - Design decisions belong to the user: when a spec is ambiguous, ask — never guess. Unresolved questions stay in the spec's "Open questions".
 - Tests never require a live PostgreSQL instance or Docker (zonky embedded PostgreSQL or H2).
 - Integration tests are close to e2e: `@SpringBootTest` random port + zonky + REST Assured; only the external boundary is mocked.

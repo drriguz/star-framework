@@ -7,6 +7,10 @@ description: The red-green TDD procedure for Spring Boot projects — failing te
 
 Deliver spec sections one at a time, each as a full red → green cycle. Never batch tests and implementation for multiple sections.
 
+## Plan before you code
+
+Before the first test, produce the implementation plan with the `star-task-split` skill (`specs/<feature>/tasks.md`): dependency-ordered tasks, each with acceptance criteria (test cases) per layer. Choose top-down (integration test first, then descend through controller → service → repository) unless the complexity lives in the data model — then bottom-up. The direction is recorded in `tasks.md`.
+
 ## Test strategy per layer
 
 | What you're testing | Slice | Notes |
@@ -53,3 +57,4 @@ Deliver spec sections one at a time, each as a full red → green cycle. Never b
 - Fidelity: tests assert the spec's status codes and payload fields.
 - Independence: no test depends on another test's state; use fresh fixtures per test.
 - Integration: features with a contract have `*IntegrationTest` coverage per `star-integration-test` (random-port HTTP + zonky + REST Assured, mocks only at the external boundary).
+- Plan coverage: every task in `specs/<feature>/tasks.md` (if present) has its ACs covered by passing tests.

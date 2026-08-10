@@ -17,6 +17,7 @@ If the project has a `CONSTITUTION.md` at its root, its principles outrank every
    - **API contract**: every path/operation in `openapi.yaml` exists with the exact method, path, status codes, and request/response schemas. Check controllers, DTOs, and validation annotations.
    - **Data model**: every table/column/constraint in `spec.md` exists in the Flyway migrations; check column types and constraints match.
    - **Tests**: each spec section has tests; tests assert the contract (status codes, payload fields), not just "no exception". Confirm no test requires a live PostgreSQL instance or Docker. Features with a contract have `*IntegrationTest` coverage per `star-integration-test` (random-port HTTP, zonky, REST Assured, mocks only at the external boundary).
+   - **Plan**: if `specs/<feature>/tasks.md` exists, every task's ACs are covered by passing tests; gaps are findings (the implementer works from the plan, so unfinished tasks usually mean missing tests or incomplete implementation).
    - **Process**: migrations are the only schema mechanism (`ddl-auto` off); no drift from the spec introduced in code.
    - **Decisions**: no design decision was made in code that the spec did not record. Check the spec's "Open questions" section: unresolved design questions with an implementation present are a FAIL finding (the implementer should have asked via `star-clarify` first).
 4. Run the test suite with the project's build tool (`./mvnw test` or `./gradlew test`).
