@@ -45,7 +45,7 @@ Four slides, one idea each:
 - **Spec is the source of truth** — one directory per feature, viewable in the browser (Swagger UI via a zero-dependency Node server). Contract changes update the spec first, never the code first.
 - **TDD with a plan** — `tasks.md`: Setup → Foundational → layers → Polish. Top-down (API first, integration-test anchored) vs bottom-up (persistence first). Every layer carries ACs.
 - **Three-layer guard** — Constitution (policy, outranks everything) / Build (mechanical: JaCoCo coverage gate ≥80/70, Flyway-only schema) / Agents (workflow gates: hard gates abort with the next command, soft gates ask).
-- **It's a template** — 3 agents, 10 skills, 5 commands, copied into any project. Auto-loaded every session via `AGENTS.md`, so the constitution and specs are always in play. Tests run without Docker (zonky embedded PG).
+- **It's a template** — 3 agents, 10 skills, 5 commands, copied into any project. Auto-loaded every session via the instructions file, so the constitution and specs are always in play. Tests run without Docker (zonky embedded PG).
 
 ## Segment 4 — Demo recording (5 min)
 
@@ -53,7 +53,7 @@ Four slides, one idea each:
 
 1. **Install** (0:30) — copy `template/` into a scratch consumer project; init the constitution with `star-constitution`.
 2. **`/specify`** (1:00) — describe a feature (e.g. "orders with items and cancellation"); spec-writer asks 2–3 design questions; watch `specs/orders/openapi.yaml` + `spec.md` appear.
-3. **Viewer** (0:30) — `node tools/serve.js`, open the browser: Swagger UI renders the contract; pick the endpoint, show the schemas.
+3. **Viewer** (0:30) — `node .github/tools/serve.js`, open the browser: Swagger UI renders the contract; pick the endpoint, show the schemas.
 4. **`/tasks`** (0:30) — the implementation plan appears with per-layer ACs.
 5. **`/implement`** (1:30) — the money shot: integration test first (red) → controller → service → repository + migration → green. Emphasize: zonky embedded PG (no Docker), REST Assured assertions matching the spec, suite green at every step.
 6. **`/review`** (0:30) — verdict PASS with findings list; coverage gate output visible.

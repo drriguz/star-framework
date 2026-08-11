@@ -119,7 +119,7 @@ specs/orders/
 
 - Implementation is tested **against** the contract and reviewed **against** it
 - Contract change? Update the spec **first**, never the code first
-- Browser-viewable: `node tools/serve.js` → Swagger UI renders every feature
+- Browser-viewable: `node .github/tools/serve.js` → Swagger UI renders every feature
 
 ```yaml
 # openapi.yaml (excerpt)
@@ -213,7 +213,7 @@ cp -r template/. /path/to/consumer-project/
 - **10 skills** — write-spec, clarify, task-split, tdd-cycle, integration-test, coverage, endpoint-scaffold, flyway-migration, pg-schema, constitution
 - **5 commands** — `/specify` `/clarify` `/tasks` `/implement` `/review`
 
-Auto-loaded every session: the consumer `AGENTS.md` pins the constitution and specs as mandatory context.
+Auto-loaded every session: the consumer instructions file (`.github/copilot-instructions.md`) pins the constitution and specs as mandatory context.
 
 Tests without Docker: **zonky embedded PostgreSQL** + REST Assured on a real random-port server.
 

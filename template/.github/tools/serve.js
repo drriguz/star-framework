@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Zero-dependency static file server for viewing feature specs in the browser.
-// Usage: node tools/serve.js [port]   (default port 8741, or set PORT env)
-// Serves the project root so specs/ and tools/api-viewer.html resolve.
+// Usage: node .github/tools/serve.js [port]   (default port 8741, or set PORT env)
+// Serves the project root so specs/ and .github/tools/api-viewer.html resolve.
 // Adds GET /api/specs -> JSON list of { name, spec, openapi } for specs/*/.
 'use strict';
 
@@ -54,7 +54,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname === '/') {
-    res.writeHead(302, { Location: '/tools/api-viewer.html' });
+    res.writeHead(302, { Location: '/.github/tools/api-viewer.html' });
     res.end();
     return;
   }

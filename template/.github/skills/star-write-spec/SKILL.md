@@ -26,7 +26,7 @@ If `specs/` does not exist in the project, create it. Feature names are kebab-ca
 
 ## Division of labor between the two files
 
-- **`openapi.yaml` is the API contract** — methods, paths, parameters, status codes, request/response schemas. The implementer writes failing tests against it; the viewer (`tools/api-viewer.html`) renders it in a browser.
+- **`openapi.yaml` is the API contract** — methods, paths, parameters, status codes, request/response schemas. The implementer writes failing tests against it; the viewer (`.github/tools/api-viewer.html`) renders it in a browser.
 - **`spec.md` holds the prose** — motivation, user stories, a short endpoints overview table (method, path, purpose — for human scanning only, detail lives in OpenAPI), the PG data model, validation rules, error format, out of scope, open questions.
 - Do not duplicate contract detail (schemas, status codes) in `spec.md` — the OpenAPI document is the canonical source and duplication drifts.
 
@@ -59,7 +59,7 @@ Think of this as "unit tests for your requirements" — it checks the spec, not 
 
 After writing, validate `openapi.yaml`:
 
-- Opens cleanly in the spec viewer (start `node tools/serve.js`, open the viewer, select the spec).
+- Opens cleanly in the spec viewer (start `node .github/tools/serve.js`, open the viewer, select the spec).
 - No operation is missing `responses`; every non-2xx response references a component or has a concrete schema.
 - Every `$ref` target exists in `components`.
 

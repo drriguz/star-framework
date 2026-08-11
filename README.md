@@ -2,9 +2,9 @@
 
 A GitHub Copilot template for delivering Spring Boot / RESTful + PostgreSQL services via **spec-driven development + TDD**.
 
-Everything distributable lives in [`template/`](template/): Copilot agents, skills, slash commands, the spec conventions, and a browser-based spec viewer. Copy it into a consumer project (or the `~/.github/` + `~/.copilot/skills` home locations for personal reuse) and the workflow is available in Copilot Chat, VS Code, and Copilot CLI.
+Everything distributable lives in `template/.github/`: agents, skills, slash commands, instructions, and the spec viewer. Copy that one folder into a consumer project (or the `~/.github/` + `~/.copilot/skills` home locations for personal reuse) and the workflow is available in Copilot Chat, VS Code, and Copilot CLI.
 
-## The workflow
+## How the workflow works
 
 ```
 /specify   →  spec-writer writes specs/<feature>/ (spec.md + openapi.yaml: API contract + PG data model)
@@ -14,21 +14,58 @@ Everything distributable lives in [`template/`](template/): Copilot agents, skil
 /review    →  reviewer diffs implementation vs spec, checks tests + plan coverage, runs suite, reports verdict
 ```
 
-The spec is the contract between phases: it is written first, tests are written against its OpenAPI contract, and it is checked at the end. If a contract change is needed, update the spec before the code.
+- **Spec is the contract between phases.** Tests are written against `openapi.yaml`; the review checks against it. If the contract changes, update the spec first — never the code first.
+- **Design decisions belong to the user.** The design phase never guesses: every design decision is proposed as options and decided by you; unresolved items stay in the spec's "Open questions".
+- **Phases are gated.** Hard-gate failures abort with the next command (missing constitution → `star-constitution init`; missing spec → `/specify`; pending design questions → `/clarify`; red baseline → fix first). Soft gates pause for your confirmation (e.g. the `tasks.md` plan).
+- **SDD + TDD on every feature.** The spec (SDD) pins *what* to build; `tasks.md` pins *how* the work is ordered with acceptance criteria (test cases) per layer; implementation is strictly red → green.
 
-**Design decisions belong to the user.** The design phase never guesses: every design decision (endpoints, status codes, payloads, validation, data model, semantics, scope) is proposed as options and decided by the user; unresolved items stay in the spec's "Open questions". This follows the Spec Kit (spec-driven development) clarify discipline.
+## Usage scenarios
 
-**Phases are gated.** Each agent aborts on hard-gate failures and tells you the next command (e.g. missing `CONSTITUTION.md` → run `star-constitution init`; missing spec → `/specify`; pending design questions → `/clarify`; red baseline → fix first). Soft gates pause for your explicit confirmation (e.g. the `tasks.md` plan).
+### 1. New project
 
-**Implementation is planned, then executed.** `tasks.md` orders the work with acceptance criteria per layer. Two directions: **top-down** (integration test against the contract first, then descend controller → service → repository) for API-driven features, or **bottom-up** (migration/repository first) when the data model is the complex part.
+```bash
+cp -r template/. my-service/            # one folder: .github/, specs/
+cd my-service
+```
+
+1. **Init the constitution** — "Use the star-constitution skill: init" (creates `CONSTITUTION.md`, the non-negotiable principles).
+2. The framework is active: `.github/` is auto-discovered by Copilot and the instructions are auto-loaded in every session.
+3. Scaffold the Spring Boot project (any starter — the framework assumes standard Maven/Gradle layout).
+4. Add test dependencies (zonky embedded PG, REST Assured) when the first feature needs them — the implementer adds them via `star-integration-test`.
+5. From here, every feature follows scenario 3.
+
+### 2. Existing project (adopt the framework)
+
+```bash
+cp -r template/.github/ my-service/.github/    # everything in one folder
+mkdir -p my-service/specs
+```
+
+1. **Init the constitution** — "Use the star-constitution skill: init".
+2. **Audit the current state** — "Use the star-constitution skill: inspect". It checks completeness plus compliance spot-checks (`ddl-auto` off, migrations dir, coverage gate present, no live-DB tests). Fix the violations it reports.
+3. Existing code stays untouched otherwise; the workflow applies to new work.
+4. From here, new features follow scenario 3; changes to existing features follow scenario 4.
+
+### 3. New feature (the full SDD + TDD loop)
+
+1. **`/specify <feature>`** — describes what you want; the spec-writer asks design questions (endpoints, status codes, payloads, data model) and writes `specs/<feature>/spec.md` + `openapi.yaml`. If ambiguity remains, run **`/clarify`** (or reply to the questions inline).
+2. **Review the spec** — `node .github/tools/serve.js`, open `http://localhost:8741/`: the OpenAPI contract renders as Swagger UI. This is your approval checkpoint — the spec is now the source of truth.
+3. **`/tasks <feature>`** — the implementer produces `tasks.md` (dependency-ordered, acceptance criteria per layer, top-down or bottom-up). Confirm the direction.
+4. **`/implement <feature>`** — executes the tasks: AC tests first (red), minimal code (green), layer by layer; integration tests are close-to-e2e (real HTTP + zonky PG + REST Assured, mocks only at the external boundary); ends with the coverage gate (`./mvnw verify`).
+5. **`/review <feature>`** — the reviewer diffs implementation vs spec, checks tests and plan coverage, runs the suite, reports **PASS/FAIL**.
+6. **Done** when review passes and the coverage gate is green.
+
+### 4. Working on an existing feature
+
+1. **Contract change?** (new field, new status code, changed behavior) — run **`/specify <feature>`** to update the spec **first**. Run **`/clarify`** if the change raises design questions. The spec is updated before any code.
+2. **No contract change** (bug fix, refactor) — run **`/implement <feature>`** directly with a description of the fix; the implementer re-plans (`/tasks` if the plan is stale), writes the failing test, fixes red → green.
+3. Re-run **`/review <feature>`** when done. Gates apply throughout: if the baseline suite is red, the implementer aborts and asks you to fix it first.
 
 ## Auto-loading in consumer projects
 
-GitHub Copilot loads these automatically, so the constitution and specs are always in play:
-
-- `template/AGENTS.md` — loaded by Copilot in every session; makes the constitution and `specs/` mandatory context, and lists the agents/skills/commands.
-- `template/.github/copilot-instructions.md` — loaded by Copilot on github.com (PRs, code review).
-- `template/.github/skills/` — auto-discovered; descriptions drive when each skill is pulled in.
+- `.github/copilot-instructions.md` — the single instructions file, loaded in every session and on github.com (PRs, code review); pins the constitution + specs as mandatory context.
+- `.github/skills/` — auto-discovered; descriptions drive when each skill is pulled in.
+- `.github/agents/` + `.github/commands/` — the personas and the `/specify /clarify /tasks /implement /review` entry points.
 
 Consumer projects adopt a **constitution** (`CONSTITUTION.md` — non-negotiable principles that outrank all instructions) via the `star-constitution` skill:
 
@@ -41,10 +78,9 @@ Use the star-constitution skill: inspect     → audits the constitution + repo 
 
 | Path | What it is |
 | ---- | ---------- |
-| `template/AGENTS.md` | Consumer-project instructions; the auto-load mechanism (constitution + specs pinned) |
-| `template/.github/copilot-instructions.md` | Same purpose for Copilot on github.com |
+| `template/.github/copilot-instructions.md` | Single consumer instructions file; the auto-load mechanism |
 | `template/.github/agents/star-spec-writer.agent.md` | Owns the specify phase; never writes code |
-| `template/.github/agents/star-implementer.agent.md` | TDD implementer; red → green per spec section |
+| `template/.github/agents/star-implementer.agent.md` | TDD implementer; red → green per task, per layer |
 | `template/.github/agents/star-reviewer.agent.md` | Compliance reviewer; verdict only, never fixes |
 | `template/.github/skills/star-write-spec/` | Spec-writing procedure + quality checklist + `spec-template.md` + `openapi-template.yaml` |
 | `template/.github/skills/star-clarify/` | Design ambiguity → targeted questions to the user; answers folded into the spec |
@@ -61,14 +97,14 @@ Use the star-constitution skill: inspect     → audits the constitution + repo 
 | `template/.github/commands/tasks.md` | `/tasks` — implementation plan for a feature |
 | `template/.github/commands/implement.md` | `/implement <feature>` — TDD implementation |
 | `template/.github/commands/review.md` | `/review <feature>` — spec-compliance review |
-| `template/specs/` | Feature specs, one directory per feature |
-| `template/tools/serve.js` | Zero-dependency Node server for the spec viewer |
-| `template/tools/api-viewer.html` | Swagger UI page that renders each feature's `openapi.yaml` |
+| `template/.github/tools/serve.js` | Zero-dependency Node server for the spec viewer |
+| `template/.github/tools/api-viewer.html` | Swagger UI page that renders each feature's `openapi.yaml` |
+| `template/specs/` | Feature specs home (copied as the seed directory) |
 
 ## Viewing specs in the browser
 
 ```bash
-node tools/serve.js      # from the consumer project root
+node .github/tools/serve.js      # from the consumer project root
 # open http://localhost:8741/
 ```
 
@@ -77,7 +113,9 @@ Pick a feature from the dropdown — its OpenAPI contract renders as Swagger UI.
 ## Install into a consumer project
 
 ```bash
-cp -r template/. /path/to/consumer-project/        # then run "Use the star-constitution skill: init"
+cp -r template/.github/ /path/to/consumer-project/.github/    # everything in one folder
+cp -r template/specs /path/to/consumer-project/               # spec home
+# then: "Use the star-constitution skill: init"
 ```
 
 Personal reuse (all projects, current user):
@@ -86,6 +124,7 @@ Personal reuse (all projects, current user):
 cp -r template/.github/agents ~/.github/agents          # VS Code / Copilot Chat
 cp -r template/.github/skills ~/.copilot/skills         # Copilot CLI skills
 cp -r template/.github/commands ~/.github/commands      # VS Code / Copilot Chat
+cp -r template/.github/tools ~/.github/tools            # spec viewer
 ```
 
 See [GitHub docs on custom agents](https://docs.github.com/en/copilot/reference/custom-agents-configuration), [skills](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills), and custom commands for the mechanics.

@@ -30,7 +30,7 @@ flowchart LR
     REVIEW --> VERDICT
 
     SPEC -.->|hard gate: read before coding| IMPLEMENT
-    SPEC -.->|rendered as Swagger UI| VIEWER["tools/serve.js<br/>http://localhost:8741"]
+    SPEC -.->|rendered as Swagger UI| VIEWER[".github/tools/serve.js<br/>http://localhost:8741"]
 ```
 
 ## Three-layer guard

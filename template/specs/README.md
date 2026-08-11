@@ -19,7 +19,7 @@ The implementer writes failing tests against `openapi.yaml`; the reviewer verifi
 ## Viewing a spec
 
 ```bash
-node tools/serve.js      # from the project root, then open http://localhost:8741/
+node .github/tools/serve.js      # from the project root, then open http://localhost:8741/
 ```
 
 The viewer renders each feature's `openapi.yaml` with Swagger UI, with a dropdown to switch features.

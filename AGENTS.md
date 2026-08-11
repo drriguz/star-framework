@@ -7,21 +7,20 @@ This file governs agents working **on this repo** (authoring/maintaining the fra
 ## Layout
 
 - `template/` — the distributable unit. Copy its contents into a consumer project root.
-  - `template/AGENTS.md` — consumer-project instructions; **the auto-load mechanism**: it is loaded by Copilot in every session and pins the constitution + specs as mandatory context. Never ship repo-relative paths from it.
-  - `template/.github/copilot-instructions.md` — same purpose for Copilot on github.com (PRs, code review).
+  - `template/.github/copilot-instructions.md` — the **single consumer instructions file**; **the auto-load mechanism**: loaded by Copilot in every session and on github.com (PRs, code review), it pins the constitution + specs as mandatory context. Never ship repo-relative paths from it.
   - `template/.github/agents/*.agent.md` — Copilot agents. Frontmatter: `description` (required), `tools` (aliases only: `read`, `edit`, `search`, `execute`, `agent`, `web`, `skill` — always include `skill` or agents lose access to skills). Agent name = filename minus `.agent.md`; commands reference it via `agent:` frontmatter.
   - `template/.github/skills/<name>/SKILL.md` — skills as **directories** (never loose files): lowercase-hyphen dir name, frontmatter `name` + `description` (description drives auto-triggering), optional `allowed-tools`. Files in the dir (templates, scripts) are discovered alongside the skill. `star-constitution` also ships `constitution-template.md` — the baseline the init/inspect procedures work from. `star-clarify` codifies the "design decisions belong to the user" discipline (Spec Kit pattern).
   - `template/.github/commands/*.md` — slash commands; frontmatter `description` + `agent`; filename = command name (`specify.md` → `/specify`).
+  - `template/.github/tools/` — spec viewer: `serve.js` (zero-dependency Node static server, run from the consumer project root) + `api-viewer.html` (Swagger UI page).
   - `template/specs/` — feature-spec home for consumer projects: `spec.md` (prose) + `openapi.yaml` (canonical API contract, OpenAPI 3.1), one directory per feature.
-  - `template/tools/` — spec viewer: `serve.js` (zero-dependency Node static server, run from the consumer project root) + `api-viewer.html` (Swagger UI page).
 - `CONSTITUTION.md` — never exists in this repo; consumers adopt it via the `star-constitution` skill (init creates it, inspect audits it). The template in `template/.github/skills/star-constitution/` is the single source of truth — do not duplicate it.
 
 ## Key invariants
 
 - All agent/skill/command/template files must work after being copied into a consumer project or `~/.github/` — no repo-relative paths, no assumptions beyond standard Maven/Gradle Spring Boot conventions. The `star-` prefix prevents collisions in shared `~/.github/`.
 - When editing any agent/skill/command, keep frontmatter minimal (omit defaults) and the body actionable: procedure, rules, definition of done.
-- Any change to the workflow must stay consistent across the three layers that teach it: `template/AGENTS.md`, the agents, and the skills.
-- Specs must be viewable: from a consumer project root, `node tools/serve.js` then `http://localhost:8741/`.
+- Any change to the workflow must stay consistent across the layers that teach it: `template/.github/copilot-instructions.md`, the agents, and the skills.
+- Specs must be viewable: from a consumer project root, `node .github/tools/serve.js` then `http://localhost:8741/`.
 
 ## Core workflow the template delivers (spec-driven + TDD)
 

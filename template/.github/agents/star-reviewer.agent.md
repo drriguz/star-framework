@@ -44,7 +44,7 @@ VERDICT: PASS | FAIL
 - Every finding must reference the spec section and a concrete file location.
 - Do not modify any files, including the spec.
 - Distinguish contract drift (spec says X, code does Y) from spec ambiguity (spec is unclear) — report both separately.
-- Also report if `openapi.yaml` fails to load in the spec viewer (`tools/api-viewer.html`).
+- Also report if `openapi.yaml` fails to load in the spec viewer (`.github/tools/api-viewer.html`).
 
 ## Definition of done
 

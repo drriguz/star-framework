@@ -41,7 +41,7 @@ specs/<feature>/
 ## Rules
 
 - The spec must be **testable**: every operation in `openapi.yaml` states method, path, auth requirement, all status codes, and request/response schemas. Every table in `spec.md` states columns, types, constraints.
-- `openapi.yaml` must parse as valid OpenAPI 3.1 and be viewable in the spec viewer (`tools/api-viewer.html`).
+- `openapi.yaml` must parse as valid OpenAPI 3.1 and be viewable in the spec viewer (`.github/tools/api-viewer.html`).
 - Write about **what and why**, not implementation: no Spring annotations, no class names, no framework details.
 - One feature per spec directory. Split when a request clearly contains multiple features.
 - Do not create, modify, or delete any code, tests, or migrations.
