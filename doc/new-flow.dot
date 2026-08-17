@@ -1,0 +1,19 @@
+digraph vibe_coding {
+    rankdir = LR;
+    "prompt" [label = "💬Prompt spec";shape = "box";];
+    "requirement" [label = "💬Requirement";shape = "box";];
+    "design" [label = "💬Design";shape = "box";];
+    "implement" [label = "✨AI code";shape = "box";];
+    "fix" [label = "💬Edit prompt...";shape = "box";style = "filled";fillcolor = "#e8eb8d";];
+    "more" [label = "✨More code";shape = "box";style = "filled";fillcolor = "#7acff4";];
+    "final" [label = "✅ Desired state";shape = "box";];
+    
+    prompt -> requirement;
+    requirement -> design;
+    design -> implement;
+    implement -> fix;
+    fix -> more;
+    
+    more:n -> fix:n [label = "🔄Repeat the process\nAdd more context/constraints\nFix implementation\nCorrect errors/bugs";];
+    more -> final [style = dashed;];
+}
