@@ -9,7 +9,7 @@
 | # | Segment | Time | Slides |
 | - | ------- | ---- | ------ |
 | 1 | The problem: AI coding without a process | 2.0 min | 2 |
-| 2 | The idea: spec → clarify → tasks → implement → review | 3.0 min | 3 |
+| 2 | The idea: spec → clarify → design → tasks → implement → review | 3.0 min | 3 |
 | 3 | Framework anatomy (spec, clarify, TDD plan, guards, template) | 3.5 min | 4–8 |
 | 4 | **Demo — pre-recorded, 5 minutes** | 5.0 min | 9–10 |
 | 5 | Design decisions worth stealing | 1.5 min | 11 |
@@ -30,11 +30,12 @@ Close with the thesis: *"We don't need a better autocomplete — we need a disci
 
 The pipeline, from left to right:
 
-1. **Spec** — the single source of truth: `spec.md` (user stories, PG data model, validation) + `openapi.yaml` (canonical API contract).
-2. **Clarify** — design decisions belong to the user. Targeted questions (≤5 per round, options + recommendation). Ambiguity is never guessed.
-3. **Tasks** — dependency-ordered implementation plan with acceptance criteria (test cases) per layer; top-down or bottom-up direction.
-4. **Implement** — TDD: AC tests first, red → green, layer by layer, suite always green.
-5. **Review** — spec-compliance verdict: PASS/FAIL with findings.
+1. **Spec** — the single source of truth: `requirements.md` (user stories, acceptance criteria, PG data model, validation) + `openapi.yaml` (canonical API contract).
+2. **Clarify** — design decisions and acceptance criteria belong to the user. Targeted questions (≤5 per round, options + recommendation). Ambiguity is never guessed.
+3. **Design** — the architecture: `design.md` (components, layering, key decisions), decided with the user.
+4. **Tasks** — dependency-ordered implementation plan with acceptance criteria (test cases) per layer, derived from the spec's ACs; top-down or bottom-up direction.
+5. **Implement** — TDD: AC tests first, red → green, layer by layer, suite always green.
+6. **Review** — spec-compliance verdict: PASS/FAIL with findings.
 
 Key phrase: "The spec is the contract between phases; the user is the design authority; the build is the enforcement."
 
@@ -42,22 +43,23 @@ Key phrase: "The spec is the contract between phases; the user is the design aut
 
 Four slides, one idea each:
 
-- **Spec is the source of truth** — one directory per feature, viewable in the browser (Swagger UI via a zero-dependency Node server). Contract changes update the spec first, never the code first.
-- **TDD with a plan** — `tasks.md`: Setup → Foundational → layers → Polish. Top-down (API first, integration-test anchored) vs bottom-up (persistence first). Every layer carries ACs.
+- **Spec is the source of truth** — one directory per feature (requirements + contract + design + tasks), viewable in the browser (Swagger UI via a zero-dependency Node server). Contract changes update the spec first, never the code first.
+- **Design then TDD with a plan** — `design.md` (architecture) then `tasks.md`: Setup → Foundational → layers → Polish. Top-down (API first, integration-test anchored) vs bottom-up (persistence first). Every layer carries ACs derived from the spec's ACs.
 - **Three-layer guard** — Constitution (policy, outranks everything) / Build (mechanical: JaCoCo coverage gate ≥80/70, Flyway-only schema) / Agents (workflow gates: hard gates abort with the next command, soft gates ask).
-- **It's a template** — 3 agents, 10 skills, 5 commands, copied into any project. Auto-loaded every session via the instructions file, so the constitution and specs are always in play. Tests run without Docker (zonky embedded PG).
+- **It's a template** — 4 agents, 11 skills, 6 commands, copied into any project. Auto-loaded every session via the instructions file, so the constitution and specs are always in play. Tests run without Docker (zonky embedded PG).
 
 ## Segment 4 — Demo recording (5 min)
 
 ### What the recording shows (record before the talk; no live coding)
 
 1. **Install** (0:30) — copy `template/` into a scratch consumer project; init the constitution with `star-constitution`.
-2. **`/specify`** (1:00) — describe a feature (e.g. "orders with items and cancellation"); spec-writer asks 2–3 design questions; watch `specs/orders/openapi.yaml` + `spec.md` appear.
+2. **`/specify`** (1:00) — describe a feature (e.g. "orders with items and cancellation"); spec-writer asks 2–3 design questions; watch `specs/orders/openapi.yaml` + `requirements.md` appear.
 3. **Viewer** (0:30) — `node .github/tools/serve.js`, open the browser: Swagger UI renders the contract; pick the endpoint, show the schemas.
-4. **`/tasks`** (0:30) — the implementation plan appears with per-layer ACs.
-5. **`/implement`** (1:30) — the money shot: integration test first (red) → controller → service → repository + migration → green. Emphasize: zonky embedded PG (no Docker), REST Assured assertions matching the spec, suite green at every step.
-6. **`/review`** (0:30) — verdict PASS with findings list; coverage gate output visible.
-7. **`/clarify`** (0:30) — if time allows: change one design decision, watch the spec (not the code) update first.
+4. **`/design`** (0:20) — the architecture appears in `design.md`.
+5. **`/tasks`** (0:30) — the implementation plan appears with per-layer ACs.
+6. **`/implement`** (1:30) — the money shot: integration test first (red) → controller → service → repository + migration → green. Emphasize: zonky embedded PG (no Docker), REST Assured assertions matching the spec, suite green at every step.
+7. **`/review`** (0:30) — verdict PASS with findings list; coverage gate output visible.
+8. **`/clarify`** (0:30) — if time allows: change one design decision, watch the spec (not the code) update first.
 
 ### Recording tips
 

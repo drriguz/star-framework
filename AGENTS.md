@@ -12,7 +12,7 @@ This file governs agents working **on this repo** (authoring/maintaining the fra
   - `template/.github/skills/<name>/SKILL.md` — skills as **directories** (never loose files): lowercase-hyphen dir name, frontmatter `name` + `description` (description drives auto-triggering), optional `allowed-tools`. Files in the dir (templates, scripts) are discovered alongside the skill. `star-constitution` also ships `constitution-template.md` — the baseline the init/inspect procedures work from. `star-clarify` codifies the "design decisions belong to the user" discipline (Spec Kit pattern).
   - `template/.github/commands/*.md` — slash commands; frontmatter `description` + `agent`; filename = command name (`specify.md` → `/specify`).
   - `template/.github/tools/` — spec viewer: `serve.js` (zero-dependency Node static server, run from the consumer project root) + `api-viewer.html` (Swagger UI page).
-  - `template/specs/` — feature-spec home for consumer projects: `spec.md` (prose) + `openapi.yaml` (canonical API contract, OpenAPI 3.1), one directory per feature.
+  - `template/specs/` — feature-spec home for consumer projects: `requirements.md` (prose, stories, ACs) + `openapi.yaml` (canonical API contract, OpenAPI 3.1), one directory per feature.
 - `CONSTITUTION.md` — never exists in this repo; consumers adopt it via the `star-constitution` skill (init creates it, inspect audits it). The template in `template/.github/skills/star-constitution/` is the single source of truth — do not duplicate it.
 
 ## Key invariants
@@ -24,18 +24,20 @@ This file governs agents working **on this repo** (authoring/maintaining the fra
 
 ## Core workflow the template delivers (spec-driven + TDD)
 
-1. `/specify` → spec-writer writes `specs/<feature>/spec.md` + `openapi.yaml` (API contract: paths, status codes, schemas; PG data model in `spec.md`). Design decisions are never guessed — `/clarify` resolves ambiguity with the user (Spec Kit pattern).
-2. `/tasks` → implementer produces `specs/<feature>/tasks.md`: dependency-ordered tasks with per-layer acceptance criteria, top-down (integration test first) or bottom-up (persistence first).
-3. `/implement <feature>` → implementer executes tasks in order, red → green per task (`@WebMvcTest` for REST, `@DataJpaTest` for persistence, `@SpringBootTest` + zonky integration).
-4. `/review <feature>` → reviewer diffs implementation vs spec (contract drift, schema drift, test quality, plan coverage), runs the suite, reports PASS/FAIL.
-5. Target stack defaults: Spring Boot (controllers, service/repository layering), PostgreSQL, Flyway migrations for schema.
+1. `/specify` → spec-writer writes `specs/<feature>/requirements.md` + `openapi.yaml` (user stories + acceptance criteria; API contract: paths, status codes, schemas; PG data model in `requirements.md`). Design decisions and acceptance criteria are never guessed — `/clarify` resolves ambiguity with the user (Spec Kit pattern).
+2. `/design` → designer writes `specs/<feature>/design.md`: architecture, layering, data flow, key decisions (Kiro-style plan phase).
+3. `/tasks` → implementer produces `specs/<feature>/tasks.md`: dependency-ordered tasks with per-layer acceptance criteria derived from the spec's ACs, top-down (integration test first) or bottom-up (persistence first).
+4. `/implement <feature>` → implementer executes tasks in order, red → green per task (`@WebMvcTest` for REST, `@DataJpaTest` for persistence, `@SpringBootTest` + zonky integration).
+5. `/review <feature>` → reviewer diffs implementation vs spec + design (contract drift, schema drift, AC coverage, design drift, test quality, plan coverage), runs the suite, reports PASS/FAIL.
+6. Target stack defaults: Spring Boot (controllers, service/repository layering), PostgreSQL, Flyway migrations for schema.
 
 ## Conventions
 
 - Never skip the test-first step: red → green, feature by feature, spec section by section.
 - Design decisions belong to the user: when a spec is ambiguous, agents must ask (via `star-clarify`), never guess.
-- Coverage is a build-enforced gate (JaCoCo, default ≥80% line / ≥70% branch): policy lives in the constitution template (clause 3), mechanics in `star-coverage`.
-- Phases are gated in every agent prompt: hard gates abort with the next suggested command (missing constitution/spec, pending design decisions, red baseline), soft gates require explicit user confirmation.
+- Acceptance criteria belong to the spec: behavioral Given/When/Then ACs live in `requirements.md`; `tasks.md` only derives per-layer test-case ACs from them.
+- Coverage is a build-enforced gate (JaCoCo, default ≥80% line / ≥70% branch): policy lives in the constitution template (clause 4), mechanics in `star-coverage`.
+- Phases are gated in every agent prompt: hard gates abort with the next suggested command (missing constitution/spec/design, pending design decisions, red baseline), soft gates require explicit user confirmation.
 - `openapi.yaml` is the source of truth for the API contract — implementation must not drift from it; update spec before code if the contract changes.
 - Tests must not require a live PG instance or Docker (zonky embedded PostgreSQL or H2 in tests); migrations via Flyway are the only schema mechanism.
 - Integration tests are close to e2e: `@SpringBootTest` random port, zonky embedded PG, REST Assured, mocks only at the external boundary — as codified in `star-integration-test`.

@@ -1,6 +1,6 @@
 ---
 name: star-clarify
-description: Procedure for resolving design ambiguity in feature specs — ask the user targeted questions, let them decide every design decision, and fold the answers back into the spec. Use when a spec has uncertain design areas or before implementing an ambiguous spec.
+description: Procedure for resolving design ambiguity in feature specs — ask the user targeted questions, let them decide every design decision, and fold the answers back into the requirements. Use when a spec has uncertain design areas, needs acceptance criteria decided, or before designing or implementing an ambiguous spec.
 ---
 
 # Clarify design decisions
@@ -16,6 +16,7 @@ Anything that changes observable behavior or the data contract:
 - Payload fields: names, types, requiredness, nested structure
 - Validation rules: formats, bounds, patterns, case sensitivity
 - Data model: tables, columns, types, constraints, relationships, cascade behavior, indexes
+- Acceptance criteria: the Given/When/Then outcomes a user story must satisfy, and their scope
 - Semantics: e.g. what "deactivate" means, what happens to children, uniqueness rules, soft vs hard delete
 - Scope: what this feature includes or explicitly excludes
 
@@ -25,7 +26,7 @@ Class names, package layout, which Spring annotation, repository method names, c
 
 ## Procedure
 
-1. Scan the spec (`spec.md` + `openapi.yaml`) for design areas that are absent, contradictory, or ambiguous. List them.
+1. Scan the spec (`requirements.md` + `openapi.yaml`) for design areas that are absent, contradictory, or ambiguous — including acceptance criteria that are missing, vague, or untestable. List them.
 2. Group into topics; tackle at most **5 questions per round** (one topic per question).
 3. Ask each question with **concrete options and a recommended default**, so the user can answer quickly:
 
@@ -36,7 +37,7 @@ Class names, package layout, which Spring annotation, repository method names, c
    c) Keep items, mark them cancelled too
    ```
 
-4. Encode every answer into the spec **immediately** — update `openapi.yaml` (contract) and `spec.md` (data model, validation, scope). Cross out nothing; overwrite the ambiguous text with the decided text.
+4. Encode every answer into the spec **immediately** — update `openapi.yaml` (contract), `requirements.md` (data model, validation, scope, acceptance criteria). Cross out nothing; overwrite the ambiguous text with the decided text.
 5. Move resolved decisions out of "Open questions"; leave only what the user explicitly deferred.
 6. Re-scan: if answers introduced new uncertainties (e.g. "cancelled" now needs a status field with its own values), run another round.
 

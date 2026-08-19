@@ -13,28 +13,31 @@ This project is built with the **star-framework** workflow: spec-driven developm
 
 Feature specs live in `specs/<feature>/`:
 
-- `spec.md` — prose: overview, user stories, PG data model, validation rules, error format, scope
+- `requirements.md` — prose: overview, user stories, acceptance criteria, PG data model, validation rules, error format, scope
 - `openapi.yaml` — the **canonical API contract** (OpenAPI 3.1)
+- `design.md` — the architecture: components, layering, key decisions
+- `tasks.md` — the implementation plan with per-layer acceptance criteria
 
 Rules:
 
-- Before implementing, changing, or reviewing any feature, first read its spec directory. No spec → no code; ask the user to run `/specify` first.
+- Before designing, implementing, changing, or reviewing any feature, first read its spec directory. No spec → no code; ask the user to run `/specify` first. No design → no tasks; run `/design` first.
 - `openapi.yaml` is the source of truth for the API contract. Implementation must never drift from it; if the contract must change, update the spec first, then the code.
 - Specs are viewable in the browser: run `node .github/tools/serve.js` and open `http://localhost:8741/`.
 
 ## Workflow
 
-- `/specify` — turn a feature idea into `specs/<feature>/spec.md` + `openapi.yaml` (spec-writer agent)
-- `/clarify` — resolve design ambiguity in a spec with targeted questions (spec-writer agent)
+- `/specify` — turn a feature idea into `specs/<feature>/requirements.md` + `openapi.yaml`, with acceptance criteria (spec-writer agent)
+- `/clarify` — resolve design ambiguity and acceptance criteria in a spec with targeted questions (spec-writer agent)
+- `/design` — produce `specs/<feature>/design.md`, the technical architecture (designer agent)
 - `/tasks <feature>` — produce the implementation plan `specs/<feature>/tasks.md` (implementer agent)
 - `/implement <feature>` — TDD implementation following tasks.md, red → green per task (implementer agent)
 - `/review <feature>` — spec-compliance review, PASS/FAIL verdict (reviewer agent)
 
 ## Agents, skills, and commands available
 
-- Agents: `star-spec-writer`, `star-implementer`, `star-reviewer` (in `.github/agents/`)
-- Skills: `star-write-spec`, `star-clarify`, `star-task-split`, `star-tdd-cycle`, `star-integration-test`, `star-coverage`, `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-constitution` (in `.github/skills/`)
-- Commands: `/specify`, `/clarify`, `/tasks`, `/implement`, `/review` (in `.github/commands/`)
+- Agents: `star-spec-writer`, `star-designer`, `star-implementer`, `star-reviewer` (in `.github/agents/`)
+- Skills: `star-write-spec`, `star-clarify`, `star-write-design`, `star-task-split`, `star-tdd-cycle`, `star-integration-test`, `star-coverage`, `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-constitution` (in `.github/skills/`)
+- Commands: `/specify`, `/clarify`, `/design`, `/tasks`, `/implement`, `/review` (in `.github/commands/`)
 
 ## Non-negotiables (detailed rules live in the skills)
 
@@ -46,4 +49,4 @@ Rules:
 - Integration tests are close to e2e: `@SpringBootTest` random port + zonky + REST Assured; only the external boundary is mocked.
 - Flyway migrations are the only schema mechanism; `ddl-auto` is `none`; applied migrations are immutable.
 - Errors follow the RFC 7807-style envelope defined in each spec.
-- Phases are gated: agents abort on hard-gate failures and suggest the next command (e.g. missing constitution → `star-constitution init`); soft gates require explicit user confirmation before proceeding.
+- Phases are gated: agents abort on hard-gate failures and suggest the next command (e.g. missing constitution → `star-constitution init`, missing design → `/design`); soft gates require explicit user confirmation before proceeding.

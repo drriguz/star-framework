@@ -3,7 +3,7 @@ info:
   title: <Feature> API
   version: 0.1.0
   description: >
-    <One paragraph: what this API does. Keep in sync with the Overview in spec.md.>
+    <One paragraph: what this API does. Keep in sync with the Overview in requirements.md.>
 servers:
   - url: /api/v1
 tags:

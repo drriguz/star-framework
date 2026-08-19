@@ -8,11 +8,13 @@ flowchart LR
 
     SPECIFY["/specify<br/>spec-writer agent"]
     CLARIFY["/clarify<br/>design decisions → user decides"]
+    DESIGN["/design<br/>designer agent"]
     TASKS["/tasks<br/>task plan"]
     IMPLEMENT["/implement<br/>implementer agent"]
     REVIEW["/review<br/>reviewer agent"]
 
-    SPEC["specs/&lt;feature&gt;/<br/>spec.md + openapi.yaml<br/>(contract: source of truth)"]
+    SPEC["specs/&lt;feature&gt;/<br/>requirements.md + openapi.yaml<br/>(contract: source of truth)"]
+    DESIGNMD["design.md<br/>architecture · key decisions"]
     TASKSMD["tasks.md<br/>dependency-ordered ACs<br/>per layer"]
     VERDICT["PASS / FAIL<br/>+ coverage gate"]
 
@@ -21,14 +23,18 @@ flowchart LR
     SPECIFY -->|writes| SPEC
     SPECIFY --> CLARIFY
     CLARIFY -.->|answers folded in| SPEC
-    CLARIFY --> TASKS
+    CLARIFY --> DESIGN
+    DESIGN -->|produces| DESIGNMD
+    DESIGN --> TASKS
     TASKS -->|produces| TASKSMD
     TASKS --> IMPLEMENT
     IMPLEMENT -->|executes, red → green| TASKSMD
     IMPLEMENT --> REVIEW
     REVIEW -.->|diffs implementation against| SPEC
+    REVIEW -.->|checks design realized| DESIGNMD
     REVIEW --> VERDICT
 
+    SPEC -.->|hard gate: read before design| DESIGN
     SPEC -.->|hard gate: read before coding| IMPLEMENT
     SPEC -.->|rendered as Swagger UI| VIEWER[".github/tools/serve.js<br/>http://localhost:8741"]
 ```
@@ -60,10 +66,11 @@ flowchart TB
 
 ## The flow in words
 
-1. **`/specify`** — the spec-writer agent turns the idea into `specs/<feature>/spec.md` (user stories, PG data model, validation) + `openapi.yaml` (canonical API contract). Design areas it can't resolve are asked, never guessed.
-2. **`/clarify`** — targeted questions (≤5, options + recommendation) resolve remaining design ambiguity; answers are folded back into the spec. Unresolved items stay in "Open questions".
-3. **`/tasks`** — the plan: dependency-ordered tasks with acceptance criteria (test cases) per layer, top-down (API first) or bottom-up (persistence first).
-4. **`/implement`** — executes the tasks: AC tests first (red), minimal code (green), layer by layer; integration tests are close-to-e2e (`@SpringBootTest` random port + zonky embedded PG + REST Assured, mocks only at the external boundary); ends with the coverage gate (`./mvnw verify`).
-5. **`/review`** — diffs the implementation against the spec (contract drift, schema drift, test quality, plan coverage), runs the gate, reports **PASS/FAIL** with findings.
+1. **`/specify`** — the spec-writer agent turns the idea into `specs/<feature>/requirements.md` (user stories, acceptance criteria, PG data model, validation) + `openapi.yaml` (canonical API contract). Design areas and acceptance criteria it can't resolve are asked, never guessed.
+2. **`/clarify`** — targeted questions (≤5, options + recommendation) resolve remaining design ambiguity and acceptance criteria; answers are folded back into the spec. Unresolved items stay in "Open questions".
+3. **`/design`** — the designer agent writes `specs/<feature>/design.md`: architecture, layering, data flow, key decisions (Kiro-style plan phase).
+4. **`/tasks`** — the plan: dependency-ordered tasks with acceptance criteria (test cases) per layer derived from the spec's ACs, top-down (API first) or bottom-up (persistence first).
+5. **`/implement`** — executes the tasks: AC tests first (red), minimal code (green), layer by layer; integration tests are close-to-e2e (`@SpringBootTest` random port + zonky embedded PG + REST Assured, mocks only at the external boundary); ends with the coverage gate (`./mvnw verify`).
+6. **`/review`** — diffs the implementation against the spec (contract drift, schema drift, AC coverage, design drift, test quality, plan coverage), runs the gate, reports **PASS/FAIL** with findings.
 
 Every phase is gated: hard-gate failures abort with the next suggested command (missing constitution → `star-constitution: init`); soft gates pause for explicit confirmation. The constitution outranks everything; the build enforces mechanically; the agents execute.

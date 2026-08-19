@@ -1,0 +1,129 @@
+openapi: 3.1.0
+info:
+  title: Orders API
+  version: 0.1.0
+  description: Create and fetch customer orders.
+servers:
+  - url: /api/v1
+tags:
+  - name: orders
+    description: Operations on orders
+paths:
+  /orders:
+    post:
+      tags: [orders]
+      summary: Create an order
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              description: URL of the created order
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /orders/{orderId}:
+    get:
+      tags: [orders]
+      summary: Fetch an order by id
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    Order:
+      type: object
+      required: [id, customerName, status, total, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerName:
+          type: string
+          maxLength: 120
+        status:
+          type: string
+          enum: [PENDING, CANCELLED]
+        total:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+    CreateOrderRequest:
+      type: object
+      required: [customerName]
+      properties:
+        customerName:
+          type: string
+          maxLength: 120
+    Error:
+      type: object
+      description: RFC 7807-style error envelope for all error responses.
+      required: [type, title, status, detail, instance]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Order not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

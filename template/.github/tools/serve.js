@@ -33,7 +33,7 @@ function listSpecs() {
     .filter((e) => e.isDirectory())
     .map((e) => ({
       name: e.name,
-      spec: `specs/${e.name}/spec.md`,
+      spec: `specs/${e.name}/requirements.md`,
       openapi: `specs/${e.name}/openapi.yaml`,
     }))
     .filter((s) => fs.existsSync(path.join(ROOT, s.openapi)));

@@ -59,15 +59,17 @@ The model is smart; the process around it is missing. That's the gap this framew
 ```mermaid
 flowchart LR
   A[Spec] --> B[Clarify]
-  B --> C[Tasks]
-  C --> D[Implement]
-  D --> E[Review]
+  B --> C[Design]
+  C --> D[Tasks]
+  D --> E[Implement]
+  E --> F[Review]
 ```
 
 | Phase | Output | Owner |
 | ----- | ------ | ----- |
-| **Spec** | `spec.md` + `openapi.yaml` — what & why, contract, data model | spec-writer agent |
-| **Clarify** | design decisions, folded back into the spec | user decides |
+| **Spec** | `requirements.md` + `openapi.yaml` — stories, ACs, contract, data model | spec-writer agent |
+| **Clarify** | design decisions + acceptance criteria, folded back into the spec | user decides |
+| **Design** | `design.md` — architecture, layering, key decisions | designer agent |
 | **Tasks** | `tasks.md` — ACs per layer, top-down or bottom-up | implementer agent |
 | **Implement** | failing tests → code → green, layer by layer | implementer agent |
 | **Review** | PASS/FAIL verdict vs the spec | reviewer agent |
@@ -83,19 +85,23 @@ The spec is the contract between phases. The user is the design authority. The b
 ```mermaid
 flowchart LR
     SPECIFY["/specify"] --> CLARIFY["/clarify"]
-    CLARIFY --> TASKS["/tasks"]
+    CLARIFY --> DESIGN["/design"]
+    DESIGN --> TASKS["/tasks"]
     TASKS --> IMPLEMENT["/implement"]
     IMPLEMENT --> REVIEW["/review"]
 
-    SPEC["specs/&lt;feature&gt;/<br/>spec.md + openapi.yaml<br/>(contract)"]
+    SPEC["specs/&lt;feature&gt;/<br/>requirements.md + openapi.yaml<br/>(contract)"]
+    DESIGNMD["design.md<br/>architecture"]
     TASKSMD["tasks.md<br/>ACs per layer"]
     VERDICT["PASS / FAIL<br/>+ coverage gate"]
 
     SPECIFY -->|writes| SPEC
     CLARIFY -.answers folded in.-> SPEC
+    DESIGN -->|produces| DESIGNMD
     TASKS -->|produces| TASKSMD
     IMPLEMENT -.executes, red → green.-> TASKSMD
     REVIEW -.diffs implementation.-> SPEC
+    REVIEW -.checks design.-> DESIGNMD
     REVIEW --> VERDICT
 ```
 
@@ -113,10 +119,13 @@ The whole framework on one slide — every slide that follows zooms into one pie
 
 ```text
 specs/orders/
-├── spec.md        # user stories · PG data model · validation · scope
-└── openapi.yaml   # canonical API contract — OpenAPI 3.1
+├── requirements.md  # stories · acceptance criteria · PG data model · validation
+├── openapi.yaml     # canonical API contract — OpenAPI 3.1
+├── design.md        # architecture — after /design
+└── tasks.md         # implementation plan — after /tasks
 ```
 
+- Acceptance criteria (Given/When/Then) live with the stories in `requirements.md`
 - Implementation is tested **against** the contract and reviewed **against** it
 - Contract change? Update the spec **first**, never the code first
 - Browser-viewable: `node .github/tools/serve.js` → Swagger UI renders every feature
@@ -158,9 +167,10 @@ This is the one rule that keeps humans in control of the product while the AI do
 
 ---
 
-# TDD, with a plan
+# Design then tasks, then TDD
 
-- `tasks.md` — dependency-ordered tasks, **acceptance criteria (test cases) per layer**
+- `/design` — the architecture first: `design.md` (components, layering, key decisions)
+- `tasks.md` — dependency-ordered tasks, **acceptance criteria (test cases) per layer**, derived from the spec's ACs
 - Two directions, chosen per feature:
 
 ```mermaid
@@ -209,9 +219,9 @@ Policy without mechanical enforcement is just a wish. That's why the build is pa
 cp -r template/. /path/to/consumer-project/
 ```
 
-- **3 agents** — spec-writer, implementer, reviewer
-- **10 skills** — write-spec, clarify, task-split, tdd-cycle, integration-test, coverage, endpoint-scaffold, flyway-migration, pg-schema, constitution
-- **5 commands** — `/specify` `/clarify` `/tasks` `/implement` `/review`
+- **4 agents** — spec-writer, designer, implementer, reviewer
+- **11 skills** — write-spec, clarify, write-design, task-split, tdd-cycle, integration-test, coverage, endpoint-scaffold, flyway-migration, pg-schema, constitution
+- **6 commands** — `/specify` `/clarify` `/design` `/tasks` `/implement` `/review`
 
 Auto-loaded every session: the consumer instructions file (`.github/copilot-instructions.md`) pins the constitution and specs as mandatory context.
 
@@ -228,11 +238,12 @@ One copy-paste installs the whole workflow — repo-level or personal (~/.github
 5 minutes, pre-recorded, no live coding:
 
 1. **Install** — template into a scratch project, constitution inited
-2. **`/specify`** — feature description → `spec.md` + `openapi.yaml` (2 design questions asked)
+2. **`/specify`** — feature description → `requirements.md` + `openapi.yaml` (2 design questions asked)
 3. **Viewer** — the contract rendered as Swagger UI in the browser
-4. **`/tasks`** — the implementation plan with per-layer ACs
-5. **`/implement`** — integration test first (red) → controller → service → repository + migration → **green**
-6. **`/review`** — PASS verdict, findings, coverage gate output
+4. **`/design`** — the architecture appears in `design.md`
+5. **`/tasks`** — the implementation plan with per-layer ACs
+6. **`/implement`** — integration test first (red) → controller → service → repository + migration → **green**
+7. **`/review`** — PASS verdict, findings, coverage gate output
 
 <video controls :src="'/demo/feature-demo.mp4'"></video>
 

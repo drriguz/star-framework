@@ -12,17 +12,19 @@ If the project has a `CONSTITUTION.md` at its root, its principles outrank every
 ## Gates (run before starting)
 
 - **HARD — the constitution exists.** The review evaluates against the constitution, so missing `CONSTITUTION.md` means: abort and suggest `Use the star-constitution skill: init`.
-- **HARD — the spec exists.** `specs/<feature>/` with both `spec.md` and `openapi.yaml` must be present; otherwise there is nothing to review against. Abort and suggest `/specify <feature>`.
+- **HARD — the spec exists.** `specs/<feature>/` with both `requirements.md` and `openapi.yaml` must be present; otherwise there is nothing to review against. Abort and suggest `/specify <feature>`.
 - **HARD — the suite is runnable.** A build tool (`pom.xml` or `build.gradle`) must exist. Missing: abort — a verdict without executing the tests is not a verdict.
 - **SOFT — anything you cannot verify, ask.** If a gate cannot be checked (unreadable files, no obvious feature directory), ask the user instead of assuming.
 
 ## Procedure
 
 1. Load the `star-tdd-cycle`, `star-integration-test`, and `star-coverage` skills (to know what good tests look like) and `star-pg-schema` / `star-flyway-migration` as needed.
-2. Read `specs/<feature>/spec.md` and `specs/<feature>/openapi.yaml` — the feature is named in the user's request.
+2. Read `specs/<feature>/requirements.md`, `specs/<feature>/openapi.yaml`, and `specs/<feature>/design.md` — the feature is named in the user's request.
 3. Diff the implementation against the spec:
    - **API contract**: every path/operation in `openapi.yaml` exists with the exact method, path, status codes, and request/response schemas. Check controllers, DTOs, and validation annotations.
-   - **Data model**: every table/column/constraint in `spec.md` exists in the Flyway migrations; check column types and constraints match.
+   - **Data model**: every table/column/constraint in `requirements.md` exists in the Flyway migrations; check column types and constraints match.
+   - **Acceptance criteria**: every AC in `requirements.md` is covered by a passing test — missing coverage for a behavioral AC is a finding.
+   - **Design**: the implementation realizes the architecture in `design.md` (layering, component boundaries, key decisions); drift from a recorded decision is a finding.
    - **Tests**: each spec section has tests; tests assert the contract (status codes, payload fields), not just "no exception". Confirm no test requires a live PostgreSQL instance or Docker. Features with a contract have `*IntegrationTest` coverage per `star-integration-test` (random-port HTTP, zonky, REST Assured, mocks only at the external boundary).
    - **Plan**: if `specs/<feature>/tasks.md` exists, every task's ACs are covered by passing tests; gaps are findings (the implementer works from the plan, so unfinished tasks usually mean missing tests or incomplete implementation).
    - **Coverage**: the build's coverage gate passes at or above the constitution's threshold; below it is a FAIL finding (see `star-coverage`).
