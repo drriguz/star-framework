@@ -14,10 +14,10 @@ Turn the spec and design into an executable plan before any code. The plan is `s
 
 ## Choose the direction
 
-- **Top-down (default)** — start at the API boundary: write the feature's integration test against `openapi.yaml` first (the outer loop), then descend layer by layer — controller → service → repository/migration — each layer with its own red → green slice tests (inner loops). The integration test stays red until the last layer lands; it is the acceptance anchor.
-  Use when the API shape and its flows are the risky part — most contract-first features.
-- **Bottom-up** — start with migration + entity, then repository → service → controller, and write the integration test last as final verification.
-  Use when the complexity lives in the data model (rich constraints, tricky queries) and the API is thin CRUD.
+- **Bottom-up (default)** — start with migration + entity, then repository → service → controller, and write the integration test last as final verification. Each layer is completed — its slice tests green and reviewed — before the next begins (the layer-by-layer loop).
+  Use by default: persistence first, then each layer up the stack, so every layer is verified in isolation before the next depends on it.
+- **Top-down** — start at the API boundary: write the feature's integration test against `openapi.yaml` first (the outer loop), then descend layer by layer — controller → service → repository/migration — each layer with its own red → green slice tests (inner loops). The integration test stays red until the last layer lands; it is the acceptance anchor.
+  Use when the API shape and its flows are the risky part and the contract should anchor everything from the start.
 
 Record the choice with a one-line rationale in `tasks.md` and call it out in your reply so the user can override it.
 
@@ -26,7 +26,7 @@ Record the choice with a one-line rationale in `tasks.md` and call it out in you
 1. **Setup** — test infrastructure that must exist first: zonky + REST Assured dependencies, integration-test conventions. No ACs beyond "context boots".
 2. **Foundational** — the Flyway migration for the feature's tables.
    AC: a `@DataJpaTest` against zonky boots with the migrated schema; columns, types, and constraints match the tables in `requirements.md`.
-3. **Layer phases** — one phase per layer in the chosen direction. Every task carries ACs (table below).
+3. **Layer phases** — one phase per layer in the chosen direction. Every task carries ACs (table below). Each layer phase ends with a **checkpoint**: the implementer summarizes the layer (tests added, spec ACs proven) and the user approves moving to the next layer before it starts.
 4. **Polish** — full suite green, spec renders in the viewer, no TODO left in code.
 
 ## Acceptance criteria per layer
