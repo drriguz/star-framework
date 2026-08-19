@@ -5,7 +5,7 @@ description: Produces an implementation task plan (specs/<feature>/tasks.md) for
 
 # Task splitting for a feature
 
-Turn the spec and design into an executable plan before any code. The plan is `specs/<feature>/tasks.md` — a working artifact (not part of the contract) that records the order of work and, for every task, the acceptance criteria: the test cases that prove the task done.
+Turn the spec and design into an executable plan before any code. The plan is `specs/<feature>/tasks.md` — a working artifact (not part of the contract) that records the order of work, per-task acceptance criteria (the test cases that prove the task done), and **progress**: task checkboxes are the resume record, ticked as each task completes.
 
 ## Inputs
 
@@ -26,7 +26,7 @@ Record the choice with a one-line rationale in `tasks.md` and call it out in you
 1. **Setup** — test infrastructure that must exist first: zonky + REST Assured dependencies, integration-test conventions. No ACs beyond "context boots".
 2. **Foundational** — the Flyway migration for the feature's tables.
    AC: a `@DataJpaTest` against zonky boots with the migrated schema; columns, types, and constraints match the tables in `requirements.md`.
-3. **Layer phases** — one phase per layer in the chosen direction. Every task carries ACs (table below). Each layer phase ends with a **checkpoint**: the implementer summarizes the layer (tests added, spec ACs proven) and the user approves moving to the next layer before it starts.
+3. **Layer phases** — one phase per layer in the chosen direction. Every task carries ACs (table below). The implementer **stops after every task** for user approval (red → user-run → green → stop); the next task starts only on explicit "continue". An optional one-line layer summary is given when a layer completes.
 4. **Polish** — full suite green, spec renders in the viewer, no TODO left in code.
 
 ## Acceptance criteria per layer
@@ -54,7 +54,7 @@ Tests are written before the implementation of the task they belong to.
   AC: <test class + what it asserts> — refs: <spec AC / openapi.yaml operation / requirements.md section / design decision>
 ```
 
-Order tasks by dependency; mark parallelizable entries with `[parallel]`.
+Order tasks by dependency; mark parallelizable entries with `[parallel]`. The checkbox doubles as the **status record**: the implementer ticks it (`- [x]`) when the task is green and approved; a restarted session resumes from the first unchecked task.
 
 ## Rules
 

@@ -23,31 +23,34 @@ Before the first test, produce the implementation plan with the `star-task-split
 ## Red
 
 1. Write a test that asserts the spec's contract for the current section (exact status code, exact payload fields, error cases).
-2. Do NOT run it yourself. Stop and hand the user the exact command; the user runs it manually and confirms it **fails for the right reason** — the endpoint/class doesn't exist or behavior is missing, not because of a typo in the test. Wait for explicit approval before implementing.
+2. Verify **by inspection** that it compiles (valid syntax, correct imports/types) so the red is a missing-behavior failure, not a typo. **Never run the build yourself.**
+3. Stop immediately. Hand the user the exact command; the user runs it manually and confirms it **fails for the right reason** — the endpoint/class doesn't exist or behavior is missing. Wait for explicit approval before implementing.
 
 ```bash
 ./mvnw test -Dtest=OrderControllerTest   # Maven: single test class
 ./gradlew test --tests OrderControllerTest  # Gradle: single test class
 ```
 
-3. After the task is green, stop and wait for the user to explicitly say "continue" before starting the next task.
+4. After the task is green and approved, tick its checkbox in `tasks.md` (`- [x] #<n>`) and stop; the next task starts only on explicit "continue". On a restart, resume from the first unchecked task.
 
 ## Green
 
 1. Implement the **minimal** code that passes — no speculative extras.
 2. For schema changes: write the Flyway migration (see `star-flyway-migration`) **before** the code that reads/writes the new column or table.
-3. Run the single test again; then run the full suite **with the coverage gate**:
+3. Do **not** run the build. Hand the same single-test command back and ask the user to run it and confirm green; then hand the full gate command:
 
 ```bash
-./mvnw verify      # Maven (includes jacoco check)
-./gradlew check    # Gradle (includes jacocoTestCoverageVerification)
+./mvnw test -Dtest=OrderControllerTest   # confirm this task's test
+./mvnw verify                           # Maven: full suite + jacoco coverage gate
+./gradlew check                         # Gradle: full suite + jacocoTestCoverageVerification
 ```
 
-4. If the gate fails, read the coverage report, add tests for the uncovered branches — never weaken code, never widen exclusions (see `star-coverage`).
+4. If the user reports the gate failing, read the coverage report, add tests for the uncovered branches — never weaken code, never widen exclusions (see `star-coverage`).
 
 ## Rules
 
 - No production code before its failing test. If you catch yourself implementing first, stop.
+- Never run the build yourself — the user runs all test commands manually; you hand the exact command and wait for the result.
 - Assert behavior, not implementation: check status codes, response bodies, and side effects — not which method names were called.
 - Tests must run without a live PostgreSQL instance: zonky embedded PostgreSQL (no Docker) for anything touching PG, H2 for pure unit logic. Never hard-code a connection to a real database.
 - Don't weaken a test to make it pass; the contract in the spec wins.
