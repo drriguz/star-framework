@@ -17,20 +17,20 @@ If the project has a `CONSTITUTION.md` at its root, its principles outrank every
 - **HARD — no pending design decisions.** The spec's "Open questions" must contain only items the user explicitly deferred. Pending decisions: abort and suggest `/clarify <feature>`.
 - **HARD — the baseline is green.** Run the existing test suite before making any change; if it fails, abort — the user must fix the red baseline before new work lands on top.
 - **SOFT — the plan is confirmed.** If `specs/<feature>/tasks.md` does not exist, produce it via `star-task-split` and get the user's explicit confirmation of the direction and task order before implementing. If it exists but the spec or design changed since, re-run the split and confirm.
-- **SOFT — the failing test is reviewed.** Before writing production code for any task, present the failing test to the user — what it asserts, the spec AC it proves, and the expected failure reason — and wait for explicit approval. This is the red → human review → green loop below.
-- **SOFT — each layer is approved.** After all tasks for a layer are green, stop and present a summary (tests added, spec ACs proven) and wait for the user to approve moving to the next layer. Do not start the next layer without explicit approval.
+- **SOFT — the failing test is run and approved by the user.** After generating the test for a task, stop and hand the user the exact command to run; the user runs it manually, confirms it fails for the expected reason, and approves before any production code is written. This is the red → user-confirmed → green loop below.
+- **SOFT — no task starts without explicit "continue".** After a task is green, stop and wait for the user to explicitly say "continue" before starting the next task. Never auto-start the next task.
 
 ## Procedure
 
 1. Load the `star-tdd-cycle`, `star-task-split`, and `star-coverage` skills. Load `star-endpoint-scaffold`, `star-flyway-migration`, `star-pg-schema`, `star-integration-test`, and `star-clarify` as each becomes relevant.
 2. Read `specs/<feature>/requirements.md`, `specs/<feature>/openapi.yaml`, and `specs/<feature>/design.md` (the feature is named in the user's request; confirm which directory if ambiguous). The spec is the **source of truth**; `openapi.yaml` is the canonical API contract; `design.md` records the architecture decisions.
-3. **Plan first**: run the `star-task-split` procedure. If `specs/<feature>/tasks.md` does not exist, produce it (direction: top-down unless the complexity lives in the data model — state the rationale) and get the user's explicit confirmation before implementing. If it exists and still matches the spec and design, use it as-is.
-4. Execute the tasks **layer by layer, bottom-up** (persistence first) — one completed layer before the next. Within each layer, every task runs the **red → human review → green** loop:
-   1. **Red** — write the task's failing test (the ACs in `tasks.md`) and run it to confirm it fails for the expected reason.
-   2. **Human review** — stop and present the failing test to the user: what it asserts, which spec AC (`refs:` in `tasks.md`) it proves, and the observed failure. Wait for explicit approval before writing any production code. If the user rejects the test, revise it (or the plan/spec via `/clarify`) and loop again.
-   3. **Green** — write the minimal production code to make it pass, keeping the test honest (assert the contract, not "no exception").
-   Layers in order: migration + entity → repository (`@DataJpaTest` + zonky) → service unit → controller slice (`@WebMvcTest`, service mocked) → **integration test last** (real HTTP + zonky + REST Assured — the acceptance anchor over the whole stack).
-   After each layer's tasks are green, **checkpoint**: summarize the layer (tests added, spec ACs proven) and wait for the user to approve the next layer. Top-down (integration test first, then descend) remains available if the user prefers it.
+3. **Plan first**: run the `star-task-split` procedure. If `specs/<feature>/tasks.md` does not exist, produce it (direction: bottom-up by default — state the rationale) and get the user's explicit confirmation before implementing. If it exists and still matches the spec and design, use it as-is.
+4. Execute the tasks **layer by layer, bottom-up** (persistence first) — one completed task before the next. For each task run the **red → user-confirmed → green** loop:
+   1. **Red (agent)** — write the task's failing test (the ACs in `tasks.md`). Do NOT run it yourself.
+   2. **User runs it manually** — stop, give the user the exact command, and ask them to run it and confirm it fails for the expected reason. Wait for explicit approval before any production code. If the user rejects the test, revise it (or the plan/spec via `/clarify`) and loop again.
+   3. **Green (agent)** — after approval, write the minimal production code, run the test until it passes, and keep the test honest (assert the contract, not "no exception").
+   Then **stop**: report the task done (test + spec AC green) and wait for the user to explicitly say "continue" before the next task.
+   Layers in order: migration + entity → repository (`@DataJpaTest` + zonky) → service unit → controller slice (`@WebMvcTest`, service mocked) → **integration test last** (real HTTP + zonky + REST Assured — the acceptance anchor over the whole stack). Top-down (integration test first, then descend) remains available if the user prefers it.
 5. After each phase, run the relevant test command. Keep the suite green at all times.
 6. Before done, run the full gate (`./mvnw verify` or `./gradlew check`) so the coverage gate passes too — see `star-coverage`. If it fails, add tests for the uncovered branches; never weaken code or widen exclusions to pass.
 

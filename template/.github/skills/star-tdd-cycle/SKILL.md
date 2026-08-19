@@ -9,7 +9,7 @@ Deliver spec sections one at a time, each as a full red → green cycle. Never b
 
 ## Plan before you code
 
-Before the first test, produce the implementation plan with the `star-task-split` skill (`specs/<feature>/tasks.md`): dependency-ordered tasks, each with acceptance criteria (test cases) per layer. Choose top-down (integration test first, then descend through controller → service → repository) unless the complexity lives in the data model — then bottom-up. The direction is recorded in `tasks.md`.
+Before the first test, produce the implementation plan with the `star-task-split` skill (`specs/<feature>/tasks.md`): dependency-ordered tasks, each with acceptance criteria (test cases) per layer. Default direction is **bottom-up** (migration + entity → repository → service → controller → integration test last), one completed task before the next; top-down (integration test first) is available if the user prefers. The direction is recorded in `tasks.md`.
 
 ## Test strategy per layer
 
@@ -23,12 +23,14 @@ Before the first test, produce the implementation plan with the `star-task-split
 ## Red
 
 1. Write a test that asserts the spec's contract for the current section (exact status code, exact payload fields, error cases).
-2. Run only that test and confirm it **fails for the right reason** — the endpoint/class doesn't exist or behavior is missing, not because of a typo in the test.
+2. Do NOT run it yourself. Stop and hand the user the exact command; the user runs it manually and confirms it **fails for the right reason** — the endpoint/class doesn't exist or behavior is missing, not because of a typo in the test. Wait for explicit approval before implementing.
 
 ```bash
 ./mvnw test -Dtest=OrderControllerTest   # Maven: single test class
 ./gradlew test --tests OrderControllerTest  # Gradle: single test class
 ```
+
+3. After the task is green, stop and wait for the user to explicitly say "continue" before starting the next task.
 
 ## Green
 
